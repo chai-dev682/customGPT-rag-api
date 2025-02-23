@@ -4,7 +4,6 @@ from functools import lru_cache
 class Settings(BaseSettings):
     # CustomGPT settings
     CUSTOMGPT_API_KEY: str
-    CUSTOMGPT_AGENT_ID: str
     WATCH_FOLDER: str = "./watch_folder"
     BASE_URL: str = "https://app.customgpt.ai/api/v1"
     
