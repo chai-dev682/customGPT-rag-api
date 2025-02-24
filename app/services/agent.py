@@ -2,7 +2,6 @@ from sseclient import SSEClient
 from typing import Dict, Any
 import requests
 import json
-import os
 from app.core.config import settings
 
 class AgentService:
@@ -31,9 +30,16 @@ class AgentService:
         response = requests.post(url, headers=self.headers, json=payload)
         return json.loads(response.text)["data"]["id"]
     
+    # delete the project
     def delete_agent(self, project_id: str):
         url = f"{self.BASE_URL}/projects/{project_id}"
         response = requests.delete(url, headers=self.headers)
+    
+    # list all pages that belong to an agent
+    def list_pages(self, project_id: str) -> Dict[str, Any]:
+        url = f"{self.BASE_URL}/projects/{project_id}/pages"
+        response = requests.get(url, headers=self.headers)
+        return json.loads(response.text)["data"]
     
     # Check status of the project if chat bot is active
     def check_agent_status(self, project_id: str) -> Dict[str, Any]:
@@ -41,6 +47,12 @@ class AgentService:
         response = requests.get(url, headers=self.headers)
         # return the chat bot status
         return json.loads(response.text)["data"]["is_chat_active"]
+    
+    # List all conversations
+    def list_conversations(self, project_id: str) -> Dict[str, Any]:
+        url = f"{self.BASE_URL}/projects/{project_id}/conversations"
+        response = requests.get(url, headers=self.headers)
+        return json.loads(response.text)["data"]
     
     # Create a conversation before sending a message to the chat bot
     def create_conversation(self, project_id: str, name: str = "My First Conversation") -> Dict[str, Any]:
