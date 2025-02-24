@@ -20,19 +20,20 @@ class AgentService:
         response.raise_for_status()
         return json.loads(response.text)["data"]
     
-    def create_agent(self, project_name: str, file_path: str) -> Dict[str, Any]:
+    def create_agent(self, project_name: str, file_path: str = None) -> Dict[str, Any]:
         url = f"{self.BASE_URL}/projects"
-
-        with open(file_path, 'rb') as f:
-            file_data = {'file': (os.path.basename(file_path), f)}
         
+        # with open(file_path, 'rb') as f:
         payload = {
-            "project_name": (None, project_name),
-            "file": file_data
+            'project_name': project_name,
+            # 'file': (os.path.basename(file_path), f, 'application/octet-stream')
         }
-        response = requests.post(url, headers=self.headers, files=payload)
-        # return the project id
+        response = requests.post(url, headers=self.headers, json=payload)
         return json.loads(response.text)["data"]["id"]
+    
+    def delete_agent(self, project_id: str):
+        url = f"{self.BASE_URL}/projects/{project_id}"
+        response = requests.delete(url, headers=self.headers)
     
     # Check status of the project if chat bot is active
     def check_agent_status(self, project_id: str) -> Dict[str, Any]:
@@ -44,7 +45,7 @@ class AgentService:
     # Create a conversation before sending a message to the chat bot
     def create_conversation(self, project_id: str, name: str = "My First Conversation") -> Dict[str, Any]:
         url = f"{self.BASE_URL}/projects/{project_id}/conversations"
-        response = requests.post(url, headers=self.headers, data=json.dumps({"name": name}))
+        response = requests.post(url, headers=self.headers, json={"name": name})
         # return the conversation id
         return json.loads(response.text)["data"]["session_id"]
     
@@ -55,10 +56,10 @@ class AgentService:
             "stream": stream
         }
         if stream == 1:
-            stream_response = requests.post(url, stream=True, headers={"Accept": "text/event-stream"}.update(self.headers), data=json.dumps(payload))
+            stream_response = requests.post(url, stream=True, headers={"Accept": "text/event-stream"} | self.headers, data=json.dumps(payload))
             response = SSEClient(stream_response)
             for event in response:
                 yield event.data
         else:
-            response = requests.post(url, stream=False, headers=self.headers, data=json.dumps(payload))
-            return response
+            response = requests.post(url, stream=False, headers=self.headers, json=payload)
+            return response.text

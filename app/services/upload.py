@@ -29,8 +29,8 @@ class FileUploadService:
         url = f"{self.BASE_URL}/projects/{project_id}/sources"
         
         with open(file_path, 'rb') as f:
-            files = {'file': (os.path.basename(file_path), f)}
-            response = requests.post(url, headers=self.headers, files=files)
+            files = (os.path.basename(file_path), f, 'application/octet-stream')
+            response = requests.post(url, headers=self.headers, files={'file': files})
             
             self.uploaded_files.add(file_hash)
             return response.text
