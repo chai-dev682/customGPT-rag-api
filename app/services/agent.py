@@ -70,8 +70,10 @@ class AgentService:
         if stream == 1:
             stream_response = requests.post(url, stream=True, headers={"Accept": "text/event-stream"} | self.headers, data=json.dumps(payload))
             response = SSEClient(stream_response)
-            for event in response:
-                yield event.data
+            for event in response.events():
+                data = json.loads(event.data)
+                if data["status"] == "progress":
+                    yield data["message"]
         else:
             response = requests.post(url, stream=False, headers=self.headers, json=payload)
             return response.text

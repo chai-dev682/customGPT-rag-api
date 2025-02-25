@@ -39,13 +39,13 @@ def main():
             st.info("No projects found. Please create a new project.")
 
         # Create new project
-        st.subheader("Create New Project")
-        project_name = st.text_input("Project Name")
+        # st.subheader("Create New Project")
+        # project_name = st.text_input("Project Name")
         
-        if project_name and st.button("Create Project"):
-            project_id = st.session_state.agent_service.create_agent(project_name)
-            st.session_state.project_id = project_id
-            st.success(f"Project created successfully! ID: {project_id}")
+        # if project_name and st.button("Create Project"):
+        #     project_id = st.session_state.agent_service.create_agent(project_name)
+        #     st.session_state.project_id = project_id
+        #     st.success(f"Project created successfully! ID: {project_id}")
 
     # Main chat interface
     if st.session_state.project_id:
@@ -54,6 +54,7 @@ def main():
             st.session_state.conversation_id = st.session_state.agent_service.create_conversation(
                 st.session_state.project_id
             )
+        # st.session_state.conversation_id = "3698647"
 
         # Display chat messages
         for message in st.session_state.messages:
@@ -77,7 +78,7 @@ def main():
                     prompt,
                     st.session_state.project_id,
                     st.session_state.conversation_id,
-                    stream=0
+                    stream=1
                 ):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
